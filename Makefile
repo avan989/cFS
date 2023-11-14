@@ -66,6 +66,9 @@ BUILDTYPE ?= debug
 INSTALLPREFIX ?= /exe
 DESTDIR ?= $(O)
 
+RKI_DIR = ./tools/rki2/build/leon-rcc
+RKI_IMAGES_DIR = ./build/rki/images
+
 # The "DESTDIR" variable is a bit more complicated because it should be an absolute
 # path for CMake, but we want to accept either absolute or relative paths.  So if
 # the path does NOT start with "/", prepend it with the current directory.
@@ -120,6 +123,11 @@ all:
 
 install:
 	$(MAKE) --no-print-directory -C "$(O)" DESTDIR="$(DESTDIR)" mission-install
+ifneq ($(PLATFORM),)
+	$(MAKE) --no-print-directory -C "$(RKI_DIR)" PLATFORM=$(PLATFORM)
+	mkdir -p $(RKI_IMAGES_DIR) && cp $(RKI_DIR)/rki.elf $(RKI_IMAGES_DIR)
+endif
+
 
 prep $(O)/.prep:
 	mkdir -p "$(O)"
@@ -128,6 +136,7 @@ prep $(O)/.prep:
 
 clean:
 	$(MAKE) --no-print-directory -C "$(O)" mission-clean
+	$(MAKE) --no-print-directory -C "$(RKI_DIR)" clean
 
 distclean:
 	rm -rf "$(O)"
